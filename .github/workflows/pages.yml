@@ -23,6 +23,14 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Add hand-tracking model and runtime
+        run: |
+          npm install --no-audit --no-fund
+          mkdir -p www/mediapipe/hands
+          find node_modules/@mediapipe/hands -maxdepth 1 -type f ! -name '*.md' -exec cp {} www/mediapipe/hands/ \;
       - name: Stamp offline cache version
         run: sed -i "s/__BUILD__/${GITHUB_SHA::7}/" www/sw.js
       - uses: actions/configure-pages@v5

@@ -38,3 +38,13 @@ Edit `www/index.html` (GitHub's pencil icon works on a phone), commit to `main`,
 * The APK is signed with a debug key. That is fine for your own phone. Publishing on Google Play needs a release keystore (ask for a signed-release workflow when you want one).
 * If a build fails, open the failed run, click the red step, and read the last lines. Paste them to me and I will fix it.
 * App name, id and icon: `capacitor.config.json` and `resources/android-icons/`.
+
+## Hand mode (selfie camera)
+
+Tap **Hand** in the toolbar and allow the camera. Steer with your hand, **pinch** thumb and index to grab, open your fingers to release.
+Pull an element tile onto the canvas, drop an atom on another to bond, pinch empty space to pan or orbit, pinch a toolbar button to press it.
+The hand model is bundled into the app at build time (from the `@mediapipe/hands` npm package), so it works offline. It runs best in good light with your hand about an arm's length from the camera.
+
+## Updating from an earlier version
+
+Unzip the new zip *into your existing project folder* (choose to replace files), then in GitHub Desktop commit the changes and click **Push origin**.
