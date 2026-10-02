@@ -1,0 +1,63 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:        # the "Run workflow" button in the Actions tab
+  push:
+    branches: [main]
+    paths: ['www/**', 'resources/**', 'capacitor.config.json', 'package.json', '.github/workflows/android.yml']
+
+permissions:
+  contents: write           # needed to attach the APK to a Release
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Create the Android project
+        run: npx cap add android
+
+      - name: App icon, vibration permission, version number
+        run: |
+          cp -r resources/android-icons/* android/app/src/main/res/
+          echo '<?xml version="1.0" encoding="utf-8"?><resources><color name="ic_launcher_background">#0D1320</color></resources>' > android/app/src/main/res/values/ic_launcher_background.xml
+          sed -i 's#<uses-permission android:name="android.permission.INTERNET" />#&\n    <uses-permission android:name="android.permission.VIBRATE" />#' android/app/src/main/AndroidManifest.xml
+          sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/; s/versionName \"1.0\"/versionName \"1.0.${{ github.run_number }}\"/" android/app/build.gradle
+
+      - name: Copy the web app into the Android project
+        run: npx cap sync android
+
+      - name: Build debug APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Name the APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk ChemForge.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ChemForge-apk
+          path: ChemForge.apk
+
+      - name: Publish as a GitHub Release (download link for your phone)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: ChemForge build ${{ github.run_number }}
+          body: "Install ChemForge.apk on Android (allow installs from this source when asked)."
+          files: ChemForge.apk

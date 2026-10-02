@@ -1,0 +1,7 @@
+{
+  "appId": "com.chemforge.app",
+  "appName": "ChemForge",
+  "webDir": "www",
+  "backgroundColor": "#070b12",
+  "android": { "allowMixedContent": false }
+}
