@@ -55,6 +55,10 @@ Keep your hand inside the dashed box shown on the camera preview: that box (the 
 Hand mode renders at 1x resolution and skips duplicate camera frames to stay fast; if the phone is still slow it drops to one-hand tracking automatically.
 
 ### Two hands
+* While you pinch, hand motion is scaled up (about 3.4x from where you grabbed), so a short move stretches across the whole screen.
+* If a hand leaves the camera view while holding, the grab is kept for about 2 seconds and resumes when it comes back.
+* Two-hand tracking is never switched off automatically; a slow phone skips camera frames instead.
+
 * Pinch empty space with both hands: zoom and pan.
 * Hold one atom in each hand and pull apart: the bond between them stretches, shows its energy, and breaks at its dissociation energy.
 * Quick pinch-tap on an element tile arms it; pinch empty space to place it, or an atom to bond a new one. Pinch the tile again to stop.
