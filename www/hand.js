@@ -16,30 +16,31 @@ function euro(s,x,t){if(s.t==null){s.x=x;s.dx=0;s.t=t;return x}const te=Math.max
 function update(h,c,t){if(h.first){h.f.x.t=h.f.y.t=null;h.first=false}h.f.x.min=h.f.y.min=h.pinch?.9:1.4;h.x=euro(h.f.x,c.x,t)*innerWidth;h.y=euro(h.f.y,c.y,t)*innerHeight;
  const was=h.pinch;if(!h.pinch&&c.ratio<.30)h.pinch=true;else if(h.pinch&&c.ratio>.45)h.pinch=false;return was===h.pinch?null:h.pinch?'down':'up'}
 function fire(type,t,h){try{t.dispatchEvent(new PointerEvent(type,{bubbles:true,cancelable:true,clientX:h.x,clientY:h.y,pointerId:h.id,pointerType:'pen',isPrimary:h.id==77,button:0,buttons:type=='pointerup'?0:1,view:window}))}catch(e){}}
-const isCv=t=>t===cv||(t&&t.id==='cv');
+const cvT=()=>window.LABON?document.getElementById('lab'):cv;
+const isCv=t=>t===cv||(t&&(t.id==='cv'||t.id==='lab'));
 function W2(x,y){const r=cv.getBoundingClientRect();project();return wp(x-r.left,y-r.top)}
 function place(wx,wy){if(!armed)return;if(armed.e)dropAtom(armed.e,wx,wy);else tpl(TP[armed.t][1],wx,wy);vib(10)}
 // ---- direct atom hold (used by the second hand so both hands can pull atoms at once)
 function hold(h,A){h.atom=A;h.wasP=!!A.p;A.p=true;h.snap=snap();sel=A.id;refresh()}
 function holdMove(h){const a=h.atom;if(!a||!atoms.includes(a))return;const[wx,wy]=W2(h.x,h.y),w=unproj(wx,wy,a._z);a.x=w[0];a.y=w[1];a.z=w[2];
- bonds.filter(b=>b.a==a.id||b.b==a.id).forEach(b=>{const e=bondE(b);if(e.dr>0&&e.fr>=1){if(h.snap){undo.push(h.snap);if(undo.length>80)undo.shift();redo=[];h.snap=null}const sd=drag;drag=null;breakBond(b,e);drag=sd}});wake()}
+ bonds.filter(b=>b.a==a.id||b.b==a.id).forEach(b=>{const e=bondE(b),o=A_(b.a==a.id?b.b:b.a);if(e.dr>0&&e.fr>=1&&o&&o.p){if(h.snap){undo.push(h.snap);if(undo.length>80)undo.shift();redo=[];h.snap=null}const sd=drag;drag=null;breakBond(b,e);drag=sd}});wake()}
 function holdEnd(h){const a=h.atom;h.atom=null;if(!a||!atoms.includes(a))return;a.p=h.wasP;const[wx,wy]=W2(h.x,h.y),t=nearAtom(wx,wy,40,a.id);
  if(t){const ex=bondOf(a.id,t.id);if(!(ex&&ex.o==ord))tryBond(a.id,t.id,ord)}else save();wake();refresh()}
 // ---- press / drag / release routing
 function press(h){h.mode=null;h.dx=h.x;h.dy=h.y;const t=document.elementFromPoint(h.x,h.y);if(!t)return;
  const tile=t.closest&&t.closest('[data-e],[data-t]');if(tile){h.mode='tile';h.tile=tile;return}
- if(isCv(t)){const[wx,wy]=W2(h.x,h.y);if(armed){place(wx,wy);h.mode='done';return}
+ if(isCv(t)){if(window.LABON){h.mode='canvas';fire('pointerdown',cvT(),h);return}const[wx,wy]=W2(h.x,h.y);if(armed){place(wx,wy);h.mode='done';return}
   const A=nearAtom(wx,wy,34),o=H.find(q=>q!==h&&q.pinch&&q.mode&&q.mode!=='done'),oh=!!o&&(o.mode==='atom'||(o.mode==='canvas'&&!!drag));
-  if(A&&oh){h.mode='atom';hold(h,A);return}if(!A&&oh)return;h.mode='canvas';fire('pointerdown',cv,h);return}
+  if(A&&oh){h.mode='atom';hold(h,A);return}if(!A&&oh)return;h.mode='canvas';fire('pointerdown',cvT(),h);return}
  const b=t.closest&&t.closest('button,.hd');if(b)b.click()}
 function move(h){switch(h.mode){
- case 'canvas':fire('pointermove',cv,h);break;
+ case 'canvas':fire('pointermove',cvT(),h);break;
  case 'tray':fire('pointermove',h.tile,h);break;
  case 'tile':if(Math.hypot(h.x-h.dx,h.y-h.dy)>26&&!td){h.mode='tray';fire('pointerdown',h.tile,{id:h.id,x:h.dx,y:h.dy});fire('pointermove',h.tile,h)}break;
  case 'atom':holdMove(h);break;
- default:if(!h.pinch&&tool==='erase'){const t=document.elementFromPoint(h.x,h.y);if(isCv(t))fire('pointermove',cv,h)}}}
+ default:if(!h.pinch&&(tool==='erase'||window.LABON)){const t=document.elementFromPoint(h.x,h.y);if(isCv(t))fire('pointermove',cvT(),h)}}}
 function release(h){const m=h.mode;h.mode=null;
- if(m==='canvas')fire('pointerup',cv,h);else if(m==='tray')fire('pointerup',h.tile,h);else if(m==='atom')holdEnd(h);
+ if(m==='canvas')fire('pointerup',cvT(),h);else if(m==='tray')fire('pointerup',h.tile,h);else if(m==='atom')holdEnd(h);
  else if(m==='tile'){const d=h.tile.dataset,k=d.e!=null?{e:d.e}:{t:+d.t};armed=armed&&armed.e===k.e&&armed.t===k.t?null:k;
   toast(armed?'Placing '+label(armed)+'. Pinch empty space to place it, or an atom to bond to it. Pinch the same tile again to stop.':'Placing off.',1);vib(10)}}
 // ---- hand identity: keep each physical hand in the same slot between frames
