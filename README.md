@@ -45,6 +45,11 @@ Tap **Hand** in the toolbar and allow the camera. Steer with your hand, **pinch*
 Pull an element tile onto the canvas, drop an atom on another to bond, pinch empty space to pan or orbit, pinch a toolbar button to press it.
 The hand model is bundled into the app at build time (from the `@mediapipe/hands` npm package), so it works offline. It runs best in good light with your hand about an arm's length from the camera.
 
+### Two hands
+* Pinch empty space with both hands: zoom and pan.
+* Hold one atom in each hand and pull apart: the bond between them stretches, shows its energy, and breaks at its dissociation energy.
+* Quick pinch-tap on an element tile arms it; pinch empty space to place it, or an atom to bond a new one. Pinch the tile again to stop.
+
 ## Updating from an earlier version
 
 Unzip the new zip *into your existing project folder* (choose to replace files), then in GitHub Desktop commit the changes and click **Push origin**.
