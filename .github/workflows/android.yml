@@ -29,8 +29,17 @@ jobs:
 
       - name: Add hand-tracking model and runtime (bundled offline)
         run: |
-          mkdir -p www/mediapipe/hands
-          find node_modules/@mediapipe/hands -maxdepth 1 -type f ! -name '*.md' -exec cp {} www/mediapipe/hands/ \;
+          mkdir -p www/mediapipe/tasks/wasm www/mediapipe/hands
+          cp node_modules/@mediapipe/tasks-vision/vision_bundle.js www/mediapipe/tasks/
+          cp node_modules/@mediapipe/tasks-vision/wasm/vision_wasm_internal.* node_modules/@mediapipe/tasks-vision/wasm/vision_wasm_nosimd_internal.* www/mediapipe/tasks/wasm/
+          curl -fsSL --retry 3 --connect-timeout 20 -o www/mediapipe/tasks/hand_landmarker.task "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task" || true
+          if [ "$(stat -c%s www/mediapipe/tasks/hand_landmarker.task 2>/dev/null || echo 0)" -gt 1000000 ]; then
+            echo "Using the MediaPipe Tasks (GPU) hand engine"
+          else
+            echo "::warning::Hand model download failed, using the older hand engine instead"
+            rm -f www/mediapipe/tasks/hand_landmarker.task
+            find node_modules/@mediapipe/hands -maxdepth 1 -type f ! -name '*.md' -exec cp {} www/mediapipe/hands/ \;
+          fi
 
       - name: Create the Android project
         run: npx cap add android

@@ -10,7 +10,8 @@
   "dependencies": {
     "@capacitor/android": "^6.2.0",
     "@capacitor/core": "^6.2.0",
-    "@mediapipe/hands": "^0.4.1675469240"
+    "@mediapipe/hands": "^0.4.1675469240",
+    "@mediapipe/tasks-vision": "1.0.1"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.2.0"

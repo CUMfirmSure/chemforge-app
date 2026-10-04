@@ -45,7 +45,12 @@ Tap **Hand** in the toolbar and allow the camera. Steer with your hand, **pinch*
 Pull an element tile onto the canvas, drop an atom on another to bond, pinch empty space to pan or orbit, pinch a toolbar button to press it.
 The hand model is bundled into the app at build time (from the `@mediapipe/hands` npm package), so it works offline. It runs best in good light with your hand about an arm's length from the camera.
 
+### Hand engine
+Hand mode uses MediaPipe Tasks (GPU) when the model could be downloaded at build time, otherwise the older MediaPipe Hands (automatic fallback; the build log shows which one was bundled).
+Menus attract the cursor and highlight (cyan) the target; a pinch within reach presses it. If tracking stalls, a watchdog restarts it.
+
 ### Lab (reaction chamber)
+Pick a vessel (test tube, round flask, conical flask, Petri dish, beaker), add elements and compounds (tap = 4 particles), or open **Ideas** for ready-made reactions (spontaneous ones and ones that need a flame). Solids settle, gases fly; an open vessel lets gas leak out.
 Top bar: **Build | Lab**. In the Lab, molecules move as a gas; collisions react with probability exp(-Ea/RT) (time-compressed so you can watch).
 Heat with **Flame**, cool with **Ice**, put out a fire with the **Extinguisher** (cools and releases inert CO2). Use **From Build** to bring in the molecules you built, and add O2, Br2, etc. from the tray.
 Reaction enthalpies are estimated from mean bond energies; activation energies are typical values or Evans-Polanyi style estimates (labelled est.).
